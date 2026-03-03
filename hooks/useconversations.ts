@@ -4,9 +4,9 @@ import { Id } from "@/convex/_generated/dataModel";
 
 export function useConversations(userId: Id<"users"> | null) {
   const conversations = useQuery(
-    userId ? api.conversations.listConversationsForUser : null,
+    api.conversations.listConversationsForUser,
     userId ? { userId } : "skip"
   );
 
-  return conversations ?? [];
+  return conversations;
 }
