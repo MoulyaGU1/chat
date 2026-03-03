@@ -27,7 +27,9 @@ export function MessageBubble({ message, isOwn, onDeleteClick, onReactionClick, 
     <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-3 group`}>
       <div className={`max-w-xs ${isOwn ? "bg-blue-600" : "bg-slate-700"} text-white rounded-lg px-4 py-2`}>
         <p className="text-sm break-words">{message.content}</p>
-        <p className="text-xs text-slate-300 mt-1">{formatTime(message.createdAt)}</p>
+        <p className="text-xs text-slate-300 mt-1">
+  {formatTime(String(message.createdAt))}
+</p>
         {reactions && reactions.length > 0 && (
           <div className="flex gap-1 mt-2 flex-wrap">
             {reactions.map((r) => (

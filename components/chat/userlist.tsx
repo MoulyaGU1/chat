@@ -2,11 +2,11 @@
 
 import React from "react";
 import { UserItem } from "./useritem";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 interface UserListProps {
   users: Doc<"users">[];
-  onSelectUser: (userId: string) => void;
+  onSelectUser: (userId: Id<"users">, userName?: string) => void;
 }
 
 export function UserList({ users, onSelectUser }: UserListProps) {
@@ -21,7 +21,13 @@ export function UserList({ users, onSelectUser }: UserListProps) {
   return (
     <div className="flex-1 overflow-y-auto space-y-1 p-2">
       {users.map((user) => (
-        <UserItem key={user._id} userId={user._id} name={user.name} imageUrl={user.imageUrl} onClick={() => onSelectUser(user._id)} />
+        <UserItem
+          key={user._id}
+          userId={user._id}
+          name={user.name}
+          imageUrl={user.image}
+          onClick={() => onSelectUser(user._id, user.name)}
+        />
       ))}
     </div>
   );

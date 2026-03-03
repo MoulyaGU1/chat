@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
