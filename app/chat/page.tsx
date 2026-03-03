@@ -7,47 +7,55 @@ import { ChatWindow } from "@/components/chat/chatwindow";
 import { useCurrentUser } from "@/hooks/usecurrentuser";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useMobile } from "@/hooks/usemobile";
 import { Loader } from "@/components/shared/loader";
 
 export default function ChatPage() {
   const { user: convexUser, clerkUser } = useCurrentUser();
   const isMobile = useMobile();
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+
+  // ✅ FIXED TYPE
+  const [selectedConversationId, setSelectedConversationId] =
+    useState<Id<"conversations"> | null>(null);
+
   const [showChat, setShowChat] = useState(false);
-  const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation);
+
+  const getOrCreateConversation = useMutation(
+    api.conversations.getOrCreateConversation
+  );
   const setPresence = useMutation(api.presence.setPresence);
 
-  // Get selected conversation details
+  // ✅ Query conversation
   const selectedConversation = useQuery(
-  api.conversations.getConversation,
-  selectedConversationId && convexUser?._id
-    ? {
-        conversationId: selectedConversationId as any,
-        userId: convexUser._id as any,
-      }
-    : "skip"
-);
+    api.conversations.getConversation,
+    selectedConversationId && convexUser?._id
+      ? {
+          conversationId: selectedConversationId,
+          userId: convexUser._id,
+        }
+      : "skip"
+  );
 
-  // Set presence when component mounts
+  // ✅ Presence handling
   useEffect(() => {
-    if (convexUser) {
-      setPresence({ userId: convexUser._id, online: true });
+    if (!convexUser) return;
 
-      return () => {
-        setPresence({ userId: convexUser._id, online: false });
-      };
-    }
-  }, [convexUser?._id]);
+    setPresence({ userId: convexUser._id, online: true });
 
-  // Create or open conversation with selected user
-  const handleSelectUser = async (userId: string) => {
+    return () => {
+      setPresence({ userId: convexUser._id, online: false });
+    };
+  }, [convexUser, setPresence]);
+
+  // ✅ Create/Open conversation
+  const handleSelectUser = async (userId: Id<"users">) => {
     if (!convexUser) return;
 
     try {
       const convId = await getOrCreateConversation({
-        userAId: convexUser._id as any,
-        userBId: userId as any,
+        userAId: convexUser._id,
+        userBId: userId,
       });
 
       setSelectedConversationId(convId);
@@ -65,11 +73,12 @@ export default function ChatPage() {
     );
   }
 
-  // Mobile layout
+  // 📱 MOBILE LAYOUT
   if (isMobile) {
     return (
       <div className="h-screen flex flex-col bg-slate-900">
         <Navbar currentUser={convexUser} />
+
         {showChat ? (
           <ChatWindow
             conversation={selectedConversation ?? null}
@@ -91,17 +100,21 @@ export default function ChatPage() {
     );
   }
 
-  // Desktop layout
+  // 🖥 DESKTOP LAYOUT
   return (
     <div className="h-screen flex flex-col bg-slate-900">
       <Navbar currentUser={convexUser} />
+
       <div className="flex-1 flex overflow-hidden">
         <Sidebar
           userId={convexUser._id}
           selectedConversationId={selectedConversationId}
-          onSelectConversation={setSelectedConversationId}
+          onSelectConversation={(id) =>
+            setSelectedConversationId(id)
+          }
           onSelectUser={handleSelectUser}
         />
+
         <ChatWindow
           conversation={selectedConversation ?? null}
           currentUserId={convexUser._id}
