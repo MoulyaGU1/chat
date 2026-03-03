@@ -1,59 +1,86 @@
 "use client";
 
 import React from "react";
-import { formatTime } from "@/lib/utils";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { formatTime } from "@/lib/time";
 
 interface MessageBubbleProps {
-  message: Doc<"messages"> & { senderName?: string; senderImage?: string | null };
+  message: Doc<"messages">;
   isOwn: boolean;
-  onDeleteClick?: () => void;
-  onReactionClick?: () => void;
-  reactions?: Array<{ emoji: string; count: number; userIds: string[] }>;
+
+  reactions?: Array<{
+    emoji: string;
+    count: number;
+    userIds: string[];
+  }>;
+
+  onDeleteClick: () => void;
+  onReactionClick: () => void;
 }
 
-export function MessageBubble({ message, isOwn, onDeleteClick, onReactionClick, reactions }: MessageBubbleProps) {
-  if (message.deleted) {
-    return (
-      <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-3`}>
-        <div className={`max-w-xs ${isOwn ? "bg-blue-600" : "bg-slate-700"} text-slate-400 italic rounded-lg px-4 py-2 text-sm`}>
-          This message was deleted
-        </div>
-      </div>
-    );
-  }
-
+export function MessageBubble({
+  message,
+  isOwn,
+  reactions,
+  onDeleteClick,
+  onReactionClick,
+}: MessageBubbleProps) {
   return (
-    <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-3 group`}>
-      <div className={`max-w-xs ${isOwn ? "bg-blue-600" : "bg-slate-700"} text-white rounded-lg px-4 py-2`}>
-        <p className="text-sm break-words">{message.content}</p>
-        <p className="text-xs text-slate-300 mt-1">
-  {formatTime(String(message.createdAt))}
-</p>
+    <div
+      className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+    >
+      <div
+        className={`
+          max-w-xs md:max-w-md
+          rounded-lg px-4 py-2
+          text-white
+          ${isOwn ? "bg-blue-600" : "bg-slate-700"}
+        `}
+      >
+        {/* MESSAGE TEXT */}
+        <p className="text-sm break-words">
+          {message.content}
+        </p>
+
+        {/* TIME ✅ FIXED */}
+        <p className="text-xs text-slate-300 mt-1 text-right">
+          {formatTime(message.createdAt)}
+        </p>
+
+        {/* REACTIONS */}
         {reactions && reactions.length > 0 && (
           <div className="flex gap-1 mt-2 flex-wrap">
-            {reactions.map((r) => (
-              <div
-                key={r.emoji}
+            {reactions.map((reaction, index) => (
+              <button
+                key={index}
                 onClick={onReactionClick}
-                className="bg-slate-600 rounded px-2 py-1 cursor-pointer hover:bg-slate-500 transition text-xs flex items-center gap-1"
+                className="bg-slate-800 px-2 py-1 rounded text-xs hover:bg-slate-600 transition"
               >
-                <span>{r.emoji}</span>
-                <span>{r.count}</span>
-              </div>
+                {reaction.emoji} {reaction.count}
+              </button>
             ))}
           </div>
         )}
+
+        {/* ACTION BUTTONS */}
+        <div className="flex gap-2 mt-2 justify-end">
+          <button
+            onClick={onReactionClick}
+            className="text-xs text-slate-300 hover:text-white"
+          >
+            👍
+          </button>
+
+          {isOwn && (
+            <button
+              onClick={onDeleteClick}
+              className="text-xs text-red-300 hover:text-red-100"
+            >
+              Delete
+            </button>
+          )}
+        </div>
       </div>
-      {isOwn && (
-        <button
-          onClick={onDeleteClick}
-          className="ml-2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition text-sm"
-          aria-label="Delete message"
-        >
-          ✕
-        </button>
-      )}
     </div>
   );
 }

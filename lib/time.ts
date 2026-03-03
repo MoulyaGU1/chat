@@ -1,13 +1,15 @@
 // lib/time.ts
 
-export function formatTime(
-  timestamp: string | number | Date
-): string {
-  const date =
-    timestamp instanceof Date
-      ? timestamp
-      : new Date(timestamp);
+/**
+ * Safely formats Convex timestamp
+ * Prevents "Invalid Date" during SSR + loading renders
+ */
+export function formatTime(timestamp?: number | null): string {
+  if (!timestamp) return "";
 
+  const date = new Date(timestamp);
+
+  // prevent invalid date crash
   if (isNaN(date.getTime())) return "";
 
   return date.toLocaleTimeString([], {
