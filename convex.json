@@ -1,0 +1,9 @@
+{
+  "name": "chat-app",
+  "displayName": "Chat App Configuration",
+  "private": true,
+  "convex": {
+    "team": "your-team",
+    "project": "your-project"
+  }
+}
