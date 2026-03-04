@@ -1,13 +1,16 @@
-export function formatTime(timestamp?: number) {
+export function formatTime(timestamp?: number | null) {
   if (!timestamp) return "";
 
-  const diff = Date.now() - timestamp;
+  const date = new Date(Number(timestamp));
 
-  if (diff < 60000) return "now";
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
+  if (isNaN(date.getTime())) return "";
 
-  return new Date(timestamp).toLocaleTimeString([], {
+  return date.toLocaleString([], {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
   });
 }

@@ -11,33 +11,37 @@ export const getOrCreateConversation = mutation({
   },
 
   handler: async (ctx, args) => {
-    // find conversations containing userA
+    const { userAId, userBId } = args;
+
+    // sort IDs so order doesn't matter
+    const members = [userAId, userBId].sort();
+
+    // find existing conversation
     const conversations = await ctx.db
       .query("conversations")
-      .withIndex("byMember", (q) =>
-        q.eq("memberIds", [args.userAId])
-      )
       .collect();
 
-    // check manually for both users
     const existing = conversations.find(
       (c) =>
         !c.isGroup &&
-        c.memberIds.includes(args.userAId) &&
-        c.memberIds.includes(args.userBId)
+        c.memberIds.length === 2 &&
+        [...c.memberIds].sort().every((id, i) => id === members[i])
     );
 
-    if (existing) return existing._id;
+    if (existing) {
+      return existing._id;
+    }
 
+    // create new conversation
     const newConversationId = await ctx.db.insert("conversations", {
       isGroup: false,
-      memberIds: [args.userAId, args.userBId],
+      memberIds: members,
       createdAt: Date.now(),
       lastMessageAt: Date.now(),
     });
 
     // initialize unread counters
-    for (const userId of [args.userAId, args.userBId]) {
+    for (const userId of members) {
       await ctx.db.insert("unreadCounts", {
         conversationId: newConversationId,
         userId,
