@@ -1,18 +1,12 @@
-// lib/time.ts
-
-/**
- * Safely formats Convex timestamp
- * Prevents "Invalid Date" during SSR + loading renders
- */
-export function formatTime(timestamp?: number | null): string {
+export function formatTime(timestamp?: number) {
   if (!timestamp) return "";
 
-  const date = new Date(timestamp);
+  const diff = Date.now() - timestamp;
 
-  // prevent invalid date crash
-  if (isNaN(date.getTime())) return "";
+  if (diff < 60000) return "now";
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
 
-  return date.toLocaleTimeString([], {
+  return new Date(timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });

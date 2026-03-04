@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Doc } from "@/convex/_generated/dataModel";
 import { formatTime } from "@/lib/time";
 
 interface MessageBubbleProps {
@@ -25,10 +25,12 @@ export function MessageBubble({
   onDeleteClick,
   onReactionClick,
 }: MessageBubbleProps) {
+
+  // Safely format time
+  const time = formatTime(message?.createdAt);
+
   return (
-    <div
-      className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
-    >
+    <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
       <div
         className={`
           max-w-xs md:max-w-md
@@ -39,13 +41,15 @@ export function MessageBubble({
       >
         {/* MESSAGE TEXT */}
         <p className="text-sm break-words">
-          {message.content}
+          {message.content ?? ""}
         </p>
 
-        {/* TIME ✅ FIXED */}
-        <p className="text-xs text-slate-300 mt-1 text-right">
-          {formatTime(message.createdAt)}
-        </p>
+        {/* TIME */}
+        {time && (
+          <p className="text-xs text-slate-300 mt-1 text-right">
+            {time}
+          </p>
+        )}
 
         {/* REACTIONS */}
         {reactions && reactions.length > 0 && (
