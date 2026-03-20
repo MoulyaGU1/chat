@@ -8,8 +8,11 @@
  * @module
  */
 
+import type * as calls from "../calls.js";
 import type * as conversations from "../conversations.js";
+import type * as emails from "../emails.js";
 import type * as messages from "../messages.js";
+import type * as notifications from "../notifications.js";
 import type * as presence from "../presence.js";
 import type * as reactions from "../reactions.js";
 import type * as typing from "../typing.js";
@@ -24,8 +27,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  calls: typeof calls;
   conversations: typeof conversations;
+  emails: typeof emails;
   messages: typeof messages;
+  notifications: typeof notifications;
   presence: typeof presence;
   reactions: typeof reactions;
   typing: typeof typing;
