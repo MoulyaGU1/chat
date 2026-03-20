@@ -7,6 +7,12 @@ import { v } from "convex/values";
 export const getUserByClerkId = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
+    // 🔐 Auth check
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
     return await ctx.db
       .query("users")
       .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
@@ -25,6 +31,12 @@ export const createUser = mutation({
     image: v.string(),
   },
   handler: async (ctx, args) => {
+    // 🔐 Auth check
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
     const existing = await ctx.db
       .query("users")
       .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
@@ -49,6 +61,12 @@ export const listAllUsers = query({
     excludeUserId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
+    // 🔐 Auth check
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
     let users = await ctx.db.query("users").collect();
 
     if (args.excludeUserId) {
@@ -68,6 +86,12 @@ export const searchUsers = query({
     excludeUserId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
+    // 🔐 Auth check
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
     let users = await ctx.db.query("users").collect();
 
     users = users.filter((u) =>
