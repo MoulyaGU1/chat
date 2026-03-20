@@ -8,7 +8,7 @@ export const getUserByClerkId = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
     // ✅ ADD HERE
-    await ctx.auth.getUserIdentity();
+  
 
     return await ctx.db
       .query("users")
@@ -29,7 +29,7 @@ export const createUser = mutation({
   },
   handler: async (ctx, args) => {
     // ✅ ADD HERE
-    await ctx.auth.getUserIdentity();
+   
 
     const existing = await ctx.db
       .query("users")
@@ -56,7 +56,7 @@ export const listAllUsers = query({
   },
   handler: async (ctx, args) => {
     // ✅ ADD HERE
-    await ctx.auth.getUserIdentity();
+   
 
     let users = await ctx.db.query("users").collect();
 
@@ -78,7 +78,7 @@ export const searchUsers = query({
   },
   handler: async (ctx, args) => {
     // ✅ ADD HERE
-    await ctx.auth.getUserIdentity();
+    
 
     let users = await ctx.db.query("users").collect();
 
