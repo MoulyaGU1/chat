@@ -11,7 +11,7 @@ export function useCurrentUser() {
   // ✅ Correct API usage
   const convexUser = useQuery(
     api.users.getUserByClerkId,
-    clerkUser ? { clerkId: clerkUser.id } : "skip"
+    isLoaded && clerkUser ? { clerkId: clerkUser.id } : "skip"
   );
 
   const createUser = useMutation(api.users.createUser);
